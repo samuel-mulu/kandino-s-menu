@@ -1,19 +1,24 @@
+"use client"
+
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import { Clock, Flame, ArrowLeft } from "lucide-react"
+import { Flame, ArrowLeft, Star } from "lucide-react"
 import Link from "next/link"
+import { useState, use } from "react"
 import { MobileContainer } from "@/components/mobile-container"
 import { BottomNav } from "@/components/bottom-nav"
 import { SimilarItems } from "@/components/similar-items"
+import { FeedbackModal } from "@/components/feedback-modal"
 import { getMenuItemById, getSimilarItems } from "@/lib/data"
 
 interface MenuDetailPageProps {
   params: Promise<{ id: string }>
 }
 
-export default async function MenuDetailPage({ params }: MenuDetailPageProps) {
-  const { id } = await params
+export default function MenuDetailPage({ params }: MenuDetailPageProps) {
+  const { id } = use(params)
   const item = getMenuItemById(id)
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
 
   if (!item) {
     notFound()
@@ -47,8 +52,8 @@ export default async function MenuDetailPage({ params }: MenuDetailPageProps) {
 
           <div className="flex items-center gap-4 mt-3">
             <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-              <Clock className="w-4 h-4" />
-              <span>{item.prepTime} min</span>
+              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <span>{item.rating.toFixed(1)}</span>
             </div>
             <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
               <Flame className="w-4 h-4" />
@@ -73,16 +78,21 @@ export default async function MenuDetailPage({ params }: MenuDetailPageProps) {
             </div>
           </div>
 
-          {/* Add to Order Button */}
-          <button className="w-full mt-6 py-4 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors active:scale-[0.98]">
-            Add to Order
+          <button
+            onClick={() => setIsFeedbackOpen(true)}
+            className="w-full mt-6 py-4 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors active:scale-[0.98]"
+          >
+            Leave Feedback
           </button>
         </div>
 
         {/* Similar Items */}
         <SimilarItems items={similarItems} />
       </div>
+
       <BottomNav />
+
+      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} itemName={item.name} />
     </MobileContainer>
   )
 }

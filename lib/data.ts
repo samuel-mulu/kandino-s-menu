@@ -4,7 +4,7 @@ export interface MenuItem {
   id: string
   name: string
   price: number
-  prepTime: number
+  rating: number
   image: string
   category: Category
   description: string
@@ -25,7 +25,7 @@ export const menuItems: MenuItem[] = [
     id: "1",
     name: "Avocado Toast",
     price: 14.0,
-    prepTime: 15,
+    rating: 4.5,
     image: "/avocado-toast-on-white-plate-with-seeds.jpg",
     category: "breakfast",
     description:
@@ -45,7 +45,7 @@ export const menuItems: MenuItem[] = [
     id: "2",
     name: "Club Sandwich",
     price: 18.5,
-    prepTime: 20,
+    rating: 4.3,
     image: "/club-sandwich-with-fries-on-dark-plate.jpg",
     category: "breakfast",
     description:
@@ -58,7 +58,7 @@ export const menuItems: MenuItem[] = [
     id: "3",
     name: "Wagyu Burger",
     price: 24.0,
-    prepTime: 25,
+    rating: 4.8,
     image: "/gourmet-wagyu-beef-burger-with-brioche-bun.jpg",
     category: "breakfast",
     description:
@@ -79,7 +79,7 @@ export const menuItems: MenuItem[] = [
     id: "4",
     name: "Caesar Salad",
     price: 12.0,
-    prepTime: 10,
+    rating: 4.2,
     image: "/caesar-salad-in-white-bowl-with-croutons.jpg",
     category: "breakfast",
     description:
@@ -91,7 +91,7 @@ export const menuItems: MenuItem[] = [
     id: "5",
     name: "Tiramisu",
     price: 9.0,
-    prepTime: 5,
+    rating: 4.7,
     image: "/tiramisu-dessert-slice-on-white-plate.jpg",
     category: "breakfast",
     description:
@@ -103,7 +103,7 @@ export const menuItems: MenuItem[] = [
     id: "6",
     name: "Fruit Platter",
     price: 10.0,
-    prepTime: 5,
+    rating: 4.4,
     image: "/fresh-fruit-platter-with-melon-and-berries.jpg",
     category: "breakfast",
     description: "A refreshing selection of seasonal fresh fruits including melon, berries, grapes, and citrus.",
@@ -115,7 +115,7 @@ export const menuItems: MenuItem[] = [
     id: "7",
     name: "Grilled Salmon",
     price: 28.0,
-    prepTime: 25,
+    rating: 4.9,
     image: "/grilled-salmon-vegetables.png",
     category: "lunch",
     description: "Fresh Atlantic salmon grilled to perfection, served with seasonal vegetables and lemon butter sauce.",
@@ -127,7 +127,7 @@ export const menuItems: MenuItem[] = [
     id: "8",
     name: "Pasta Carbonara",
     price: 19.0,
-    prepTime: 20,
+    rating: 4.6,
     image: "/creamy-pasta-carbonara-with-bacon.jpg",
     category: "lunch",
     description:
@@ -139,7 +139,7 @@ export const menuItems: MenuItem[] = [
     id: "9",
     name: "Thai Green Curry",
     price: 16.0,
-    prepTime: 18,
+    rating: 4.4,
     image: "/thai-green-curry-in-bowl-with-rice.jpg",
     category: "lunch",
     description: "Aromatic green curry with tender chicken, bamboo shoots, and Thai basil in coconut milk.",
@@ -151,7 +151,7 @@ export const menuItems: MenuItem[] = [
     id: "10",
     name: "Ribeye Steak",
     price: 42.0,
-    prepTime: 30,
+    rating: 4.9,
     image: "/ribeye-steak-with-herbs-on-plate.jpg",
     category: "dinner",
     description:
@@ -164,7 +164,7 @@ export const menuItems: MenuItem[] = [
     id: "11",
     name: "Lobster Risotto",
     price: 38.0,
-    prepTime: 35,
+    rating: 4.7,
     image: "/lobster-risotto-in-white-bowl.jpg",
     category: "dinner",
     description: "Creamy arborio rice with butter-poached lobster, saffron, and fresh herbs.",
@@ -175,7 +175,7 @@ export const menuItems: MenuItem[] = [
     id: "12",
     name: "Duck Confit",
     price: 34.0,
-    prepTime: 28,
+    rating: 4.5,
     image: "/duck-confit-with-crispy-skin-on-plate.jpg",
     category: "dinner",
     description: "Slow-cooked duck leg with crispy skin, served with duck fat potatoes and cherry reduction.",
@@ -187,7 +187,7 @@ export const menuItems: MenuItem[] = [
     id: "13",
     name: "Chocolate Lava Cake",
     price: 11.0,
-    prepTime: 12,
+    rating: 4.8,
     image: "/chocolate-lava-cake-with-molten-center.jpg",
     category: "treats",
     description: "Warm chocolate cake with a molten center, served with vanilla ice cream and fresh berries.",
@@ -199,7 +199,7 @@ export const menuItems: MenuItem[] = [
     id: "14",
     name: "Crème Brûlée",
     price: 10.0,
-    prepTime: 8,
+    rating: 4.6,
     image: "/creme-brulee-with-caramelized-sugar-top.jpg",
     category: "treats",
     description: "Classic French custard with a perfectly caramelized sugar crust and fresh vanilla bean.",
@@ -210,7 +210,7 @@ export const menuItems: MenuItem[] = [
     id: "15",
     name: "Cheesecake",
     price: 9.5,
-    prepTime: 5,
+    rating: 4.5,
     image: "/new-york-cheesecake-slice-with-berry-sauce.jpg",
     category: "treats",
     description: "New York style cheesecake with graham cracker crust and mixed berry compote.",

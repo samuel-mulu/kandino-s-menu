@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Clock } from "lucide-react"
+import { Star } from "lucide-react"
 import type { MenuItem } from "@/lib/data"
 
 interface MenuCardProps {
@@ -19,8 +19,8 @@ export function MenuCard({ item }: MenuCardProps) {
           <div className="flex items-center justify-between mt-1">
             <span className="text-blue-500 font-semibold text-sm">${item.price.toFixed(2)}</span>
             <div className="flex items-center gap-1 text-muted-foreground text-xs">
-              <Clock className="w-3.5 h-3.5" />
-              <span>{item.prepTime} min</span>
+              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+              <span>{item.rating.toFixed(1)}</span>
             </div>
           </div>
         </div>
