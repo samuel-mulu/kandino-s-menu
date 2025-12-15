@@ -1,6 +1,17 @@
 // API client for restaurant-menu-backend
+// Backend base URL must be provided via environment variable:
+//   NEXT_PUBLIC_API_URL=https://your-backend-domain.com/api/v1
+// (set this in `hotel-menu-app/.env.local`)
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+
+if (!apiBaseUrl) {
+  throw new Error(
+    "NEXT_PUBLIC_API_URL is not set. Add it to your .env.local file (e.g. NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1)."
+  );
+}
+
+const API_BASE_URL = apiBaseUrl;
 
 interface ApiResponse<T> {
   success: boolean;
@@ -143,4 +154,3 @@ export async function addCommentToItem(
     throw error;
   }
 }
-
