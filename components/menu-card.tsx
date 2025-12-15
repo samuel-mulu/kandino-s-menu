@@ -14,9 +14,9 @@ export function MenuCard({ item }: MenuCardProps) {
           <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
         </div>
         <div className="pt-3">
-          <h3 className="font-medium text-foreground text-sm truncate">{item.name}</h3>
+          <h3 className="font-medium text-focused text-sm truncate">{item.name}</h3>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-blue-500 font-semibold text-sm">${item.price.toFixed(2)}</span>
+            <span className="text-blue-500 font-semibold text-sm">{Math.round(item.price)} ብር</span>
           </div>
         </div>
       </div>

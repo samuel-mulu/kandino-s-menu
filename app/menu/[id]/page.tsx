@@ -98,7 +98,7 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
         <div className="px-4 py-5">
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-2xl font-bold text-foreground">{item.name}</h1>
-            <span className="text-2xl font-bold text-blue-500">${item.price.toFixed(2)}</span>
+            <span className="text-2xl font-bold text-blue-500">{Math.round(item.price)} ብር</span>
           </div>
 
           <div className="flex items-center gap-4 mt-3">
