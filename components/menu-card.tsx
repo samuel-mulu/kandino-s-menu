@@ -1,6 +1,5 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Star } from "lucide-react"
 import type { MenuItem } from "@/lib/data"
 
 interface MenuCardProps {
@@ -18,10 +17,6 @@ export function MenuCard({ item }: MenuCardProps) {
           <h3 className="font-medium text-foreground text-sm truncate">{item.name}</h3>
           <div className="flex items-center justify-between mt-1">
             <span className="text-blue-500 font-semibold text-sm">${item.price.toFixed(2)}</span>
-            <div className="flex items-center gap-1 text-muted-foreground text-xs">
-              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-              <span>{item.rating.toFixed(1)}</span>
-            </div>
           </div>
         </div>
       </div>

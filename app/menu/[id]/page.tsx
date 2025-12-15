@@ -2,14 +2,15 @@
 
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import { Flame, ArrowLeft, Star } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { useState, use } from "react"
+import { useState, useEffect, use } from "react"
 import { MobileContainer } from "@/components/mobile-container"
 import { BottomNav } from "@/components/bottom-nav"
 import { SimilarItems } from "@/components/similar-items"
 import { FeedbackModal } from "@/components/feedback-modal"
-import { getMenuItemById, getSimilarItems } from "@/lib/data"
+import type { MenuItem } from "@/lib/data"
+import { fetchItemById, fetchItems, transformItem } from "@/lib/api"
 
 interface MenuDetailPageProps {
   params: Promise<{ id: string }>
@@ -17,14 +18,64 @@ interface MenuDetailPageProps {
 
 export default function MenuDetailPage({ params }: MenuDetailPageProps) {
   const { id } = use(params)
-  const item = getMenuItemById(id)
+  const [item, setItem] = useState<MenuItem | null>(null)
+  const [similarItems, setSimilarItems] = useState<MenuItem[]>([])
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadItem() {
+      try {
+        const fetchedItem = await fetchItemById(id)
+        if (!fetchedItem) {
+          notFound()
+          return
+        }
+
+        const transformedItem = {
+          ...transformItem(fetchedItem),
+          isPopular: fetchedItem.special, // Map special to isPopular
+        }
+        setItem(transformedItem)
+
+        // Fetch similar items (same category)
+        const categoryId = fetchedItem.categoryId || fetchedItem.category?.id
+        if (categoryId) {
+          const allItems = await fetchItems(categoryId)
+          const similar = allItems
+            .filter((i) => i.id !== id && i.isAvailable)
+            .slice(0, 4)
+            .map((i) => ({
+              ...transformItem(i),
+              isPopular: i.special,
+            }))
+          setSimilarItems(similar)
+        }
+      } catch (error) {
+        console.error("Failed to load item:", error)
+        notFound()
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadItem()
+  }, [id])
+
+  if (loading) {
+    return (
+      <MobileContainer>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-muted-foreground">Loading...</div>
+        </div>
+        <BottomNav />
+      </MobileContainer>
+    )
+  }
 
   if (!item) {
     notFound()
   }
-
-  const similarItems = getSimilarItems(item, 4)
 
   return (
     <MobileContainer>
@@ -51,14 +102,6 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
           </div>
 
           <div className="flex items-center gap-4 mt-3">
-            <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span>{item.rating.toFixed(1)}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-              <Flame className="w-4 h-4" />
-              <span>{item.calories} cal</span>
-            </div>
             {item.isPopular && (
               <span className="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs font-medium rounded-full">Popular</span>
             )}
@@ -67,16 +110,32 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
           <p className="mt-4 text-muted-foreground text-sm leading-relaxed">{item.description}</p>
 
           {/* Ingredients */}
-          <div className="mt-6">
-            <h2 className="text-base font-semibold text-foreground mb-3">Ingredients</h2>
-            <div className="flex flex-wrap gap-2">
-              {item.ingredients.map((ingredient, index) => (
-                <span key={index} className="px-3 py-1.5 bg-muted rounded-full text-xs text-foreground">
-                  {ingredient}
-                </span>
-              ))}
+          {item.ingredients && item.ingredients.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-base font-semibold text-foreground mb-3">Ingredients</h2>
+              <div className="flex flex-wrap gap-2">
+                {item.ingredients.map((ingredient, index) => (
+                  <span key={index} className="px-3 py-1.5 bg-muted rounded-full text-xs text-foreground">
+                    {ingredient}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Comments */}
+          {item.comments && item.comments.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-base font-semibold text-foreground mb-3">Comments</h2>
+              <div className="space-y-3">
+                {item.comments.map((comment, index) => (
+                  <div key={index} className="p-3 bg-muted rounded-lg text-sm text-foreground">
+                    {comment}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <button
             onClick={() => setIsFeedbackOpen(true)}
@@ -92,7 +151,23 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
 
       <BottomNav />
 
-      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} itemName={item.name} />
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+        itemId={item.id}
+        itemName={item.name}
+        onCommentAdded={async () => {
+          // Reload item to get updated comments
+          const updatedItem = await fetchItemById(id)
+          if (updatedItem) {
+            const transformedItem = {
+              ...transformItem(updatedItem),
+              isPopular: updatedItem.special,
+            }
+            setItem(transformedItem)
+          }
+        }}
+      />
     </MobileContainer>
   )
 }

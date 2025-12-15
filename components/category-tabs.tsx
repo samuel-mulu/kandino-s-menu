@@ -1,12 +1,13 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type { Category } from "@/lib/data"
+
+export type CategoryId = string | "special"
 
 interface CategoryTabsProps {
-  categories: { id: Category; label: string }[]
-  activeCategory: Category
-  onCategoryChange: (category: Category) => void
+  categories: { id: string; label: string }[]
+  activeCategory: CategoryId
+  onCategoryChange: (category: CategoryId) => void
 }
 
 export function CategoryTabs({ categories, activeCategory, onCategoryChange }: CategoryTabsProps) {

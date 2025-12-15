@@ -2,30 +2,54 @@
 
 import { useState } from "react"
 import { X } from "lucide-react"
-import { StarRating } from "./star-rating"
+import { addCommentToItem } from "@/lib/api"
 
 interface FeedbackModalProps {
   isOpen: boolean
   onClose: () => void
+  itemId: string
   itemName: string
+  onCommentAdded?: () => void
 }
 
-export function FeedbackModal({ isOpen, onClose, itemName }: FeedbackModalProps) {
-  const [rating, setRating] = useState(0)
+export function FeedbackModal({ isOpen, onClose, itemId, itemName, onCommentAdded }: FeedbackModalProps) {
   const [comment, setComment] = useState("")
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   if (!isOpen) return null
 
-  const handleSubmit = () => {
-    // Here you would typically send the feedback to your backend
-    setSubmitted(true)
-    setTimeout(() => {
-      onClose()
-      setRating(0)
-      setComment("")
-      setSubmitted(false)
-    }, 1500)
+  const handleSubmit = async () => {
+    if (!comment.trim()) {
+      setError("Please enter a comment")
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      await addCommentToItem(itemId, comment)
+      setSubmitted(true)
+      
+      // Call callback to refresh item data
+      if (onCommentAdded) {
+        onCommentAdded()
+      }
+
+      setTimeout(() => {
+        onClose()
+        setComment("")
+        setSubmitted(false)
+        setError(null)
+      }, 1500)
+    } catch (err) {
+      console.error("Failed to add comment:", err)
+      setError("Failed to submit comment. Please try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -56,15 +80,7 @@ export function FeedbackModal({ isOpen, onClose, itemName }: FeedbackModalProps)
         ) : (
           <>
             <h2 className="text-xl font-bold text-foreground mb-1">Leave Feedback</h2>
-            <p className="text-muted-foreground text-sm mb-6">How was your {itemName}?</p>
-
-            {/* Rating Stars */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-foreground mb-3">Your Rating</label>
-              <div className="flex justify-center">
-                <StarRating rating={rating} onRatingChange={setRating} size="lg" />
-              </div>
-            </div>
+            <p className="text-muted-foreground text-sm mb-6">Share your thoughts about {itemName}</p>
 
             {/* Comment Textarea */}
             <div className="mb-6">
@@ -74,16 +90,20 @@ export function FeedbackModal({ isOpen, onClose, itemName }: FeedbackModalProps)
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Tell us about your experience..."
                 className="w-full h-28 px-4 py-3 bg-muted rounded-xl text-foreground placeholder:text-muted-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
               />
+              {error && (
+                <p className="mt-2 text-sm text-red-500">{error}</p>
+              )}
             </div>
 
             {/* Submit Button */}
             <button
               onClick={handleSubmit}
-              disabled={rating === 0}
+              disabled={!comment.trim() || loading}
               className="w-full py-4 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Feedback
+              {loading ? "Submitting..." : "Submit Comment"}
             </button>
           </>
         )}
