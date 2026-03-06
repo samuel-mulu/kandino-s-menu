@@ -11,7 +11,17 @@ export function MenuCard({ item }: MenuCardProps) {
     <Link href={`/menu/${item.id}`} className="block group">
       <div className="bg-background rounded-2xl overflow-hidden transition-transform group-hover:scale-[1.02]">
         <div className="aspect-square relative overflow-hidden rounded-2xl">
-          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+          <Image 
+            src={item.image || "/image.jpg"} 
+            alt={item.name} 
+            fill 
+            className="object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.srcset = "";
+              target.src = "/image.jpg";
+            }}
+          />
         </div>
         <div className="pt-3">
           <h3 className="font-medium text-focused text-sm truncate">{item.name}</h3>

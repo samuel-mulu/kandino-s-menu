@@ -22,6 +22,7 @@ interface ApiResponse<T> {
 interface BackendCategory {
   id: string;
   name: string;
+  isFavorite?: boolean;
 }
 
 interface BackendImage {
@@ -41,6 +42,7 @@ export interface BackendItem {
   mealType?: "breakfast" | "lunch" | "dinner" | "treats";
   comments?: string[];
   special?: boolean;
+  isFavorite?: boolean;
   isAvailable: boolean;
 }
 
@@ -49,7 +51,7 @@ export function transformItem(item: BackendItem): any {
   return {
     ...item,
     // Transform image.url to image string for backward compatibility
-    image: item.image?.url || "/placeholder.svg",
+    image: item.image?.url || "/image.jpg",
   };
 }
 
@@ -119,23 +121,13 @@ export async function addCommentToItem(
   comment: string
 ): Promise<BackendItem> {
   try {
-    // First fetch the current item to get existing comments
-    const currentItem = await fetchItemById(id);
-    if (!currentItem) {
-      throw new Error("Item not found");
-    }
-
-    // Append new comment to existing comments
-    const updatedComments = [...(currentItem.comments || []), comment.trim()];
-
-    // Update item with new comments array
-    const response = await fetch(`${API_BASE_URL}/items/${id}`, {
-      method: "PATCH",
+    const response = await fetch(`${API_BASE_URL}/items/${id}/comments`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        comments: updatedComments,
+        comment: comment.trim(),
       }),
     });
 
@@ -152,5 +144,66 @@ export async function addCommentToItem(
   } catch (error) {
     console.error("Error adding comment:", error);
     throw error;
+  }
+}
+
+// Call waiter for a table
+export async function callWaiter(
+  tableNumber: number,
+  metadata?: any
+): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/table-notifications`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tableNumber,
+        metadata,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to call waiter: ${response.statusText}`);
+    }
+
+    const result: ApiResponse<any> = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || "Failed to call waiter");
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Error calling waiter:", error);
+    throw error;
+  }
+}
+
+// Fetch restaurant location settings
+export async function fetchRestaurantLocation(): Promise<{
+  lat: number;
+  lng: number;
+  radius: number;
+}> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/owner/location`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch location settings: ${response.statusText}`);
+    }
+    const result: ApiResponse<{ lat: number; lng: number; radius: number }> =
+      await response.json();
+    if (!result.success || !result.data) {
+      throw new Error(result.message || "Invalid location data received");
+    }
+    return result.data;
+  } catch (error) {
+    console.error("Error fetching restaurant location:", error);
+    // Fallback if API fails
+    return {
+      lat: 8.9944312,
+      lng: 38.7737417,
+      radius: 500,
+    };
   }
 }

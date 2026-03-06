@@ -1,16 +1,19 @@
-import type React from "react"
+import { Analytics } from "@vercel/analytics/next"
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
+import type React from "react"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
+import { Suspense } from "react"
+import { CallWaiter } from "@/components/call-waiter"
+import { LocationGuard } from "@/components/location-guard"
+
 export const metadata: Metadata = {
-  title: "Hotel Cuisine - Menu",
-  description: "Browse our delicious hotel menu offerings",
-  generator: "v0.app",
+  title: "kandino's kitchen - Menu",
+  description: "Browse our delicious menu offerings",
 }
 
 export const viewport: Viewport = {
@@ -29,7 +32,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased`}>
-        {children}
+        <Suspense fallback={null}>
+          <LocationGuard>
+            {children}
+            <CallWaiter />
+          </LocationGuard>
+        </Suspense>
         <Analytics />
       </body>
     </html>

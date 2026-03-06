@@ -5,5 +5,5 @@ interface MobileContainerProps {
 }
 
 export function MobileContainer({ children }: MobileContainerProps) {
-  return <div className="min-h-screen w-full bg-background flex flex-col relative pb-16">{children}</div>
+  return <div className="h-screen w-full bg-background flex flex-col relative overflow-hidden pb-16">{children}</div>
 }

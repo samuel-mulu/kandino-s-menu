@@ -2,15 +2,16 @@
 
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, MessageSquare, Send, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, use } from "react"
 import { MobileContainer } from "@/components/mobile-container"
 import { BottomNav } from "@/components/bottom-nav"
 import { SimilarItems } from "@/components/similar-items"
-import { FeedbackModal } from "@/components/feedback-modal"
 import type { MenuItem } from "@/lib/data"
-import { fetchItemById, fetchItems, transformItem } from "@/lib/api"
+import { fetchItemById, fetchItems, transformItem, addCommentToItem } from "@/lib/api"
+import { SplashScreen } from "@/components/splash-screen"
+import { toast } from "sonner"
 
 interface MenuDetailPageProps {
   params: Promise<{ id: string }>
@@ -20,8 +21,9 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
   const { id } = use(params)
   const [item, setItem] = useState<MenuItem | null>(null)
   const [similarItems, setSimilarItems] = useState<MenuItem[]>([])
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [newComment, setNewComment] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     async function loadItem() {
@@ -62,15 +64,29 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
     loadItem()
   }, [id])
 
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newComment.trim() || isSubmitting) return
+
+    setIsSubmitting(true)
+    try {
+      const updatedItem = await addCommentToItem(id, newComment)
+      setItem({
+        ...transformItem(updatedItem),
+        isPopular: updatedItem.special
+      })
+      setNewComment("")
+      toast.success("Thank you for your feedback!")
+    } catch (error) {
+      console.error("Failed to add comment:", error)
+      toast.error("Failed to post comment. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   if (loading) {
-    return (
-      <MobileContainer>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-muted-foreground">Loading...</div>
-        </div>
-        <BottomNav />
-      </MobileContainer>
-    )
+    return <SplashScreen />
   }
 
   if (!item) {
@@ -83,7 +99,17 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
         {/* Hero Image Section */}
         <div className="relative">
           <div className="aspect-[4/3] relative">
-            <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+            <Image 
+              src={item.image || "/image.jpg"} 
+              alt={item.name} 
+              fill 
+              className="object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.srcset = "";
+                target.src = "/image.jpg";
+              }}
+            />
           </div>
           <Link
             href="/"
@@ -123,26 +149,47 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
             </div>
           )}
 
-          {/* Comments */}
-          {item.comments && item.comments.length > 0 && (
-            <div className="mt-6">
-              <h2 className="text-base font-semibold text-foreground mb-3">Comments</h2>
-              <div className="space-y-3">
-                {item.comments.map((comment, index) => (
-                  <div key={index} className="p-3 bg-muted rounded-lg text-sm text-foreground">
-                    {comment}
-                  </div>
-                ))}
-              </div>
+          {/* Feedback/Comments Section */}
+          <div className="mt-10 pt-6 border-t border-border">
+            <div className="flex items-center gap-2 mb-6">
+              <MessageSquare className="w-5 h-5 text-blue-500" />
+              <h2 className="text-lg font-bold">Feedback</h2>
             </div>
-          )}
 
-          <button
-            onClick={() => setIsFeedbackOpen(true)}
-            className="w-full mt-6 py-4 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors active:scale-[0.98]"
-          >
-            Leave Feedback
-          </button>
+            {/* Existing Comments */}
+            <div className="space-y-4 mb-8">
+              {item.comments && item.comments.length > 0 ? (
+                item.comments.map((comment, index) => (
+                  <div key={index} className="p-4 bg-muted/30 rounded-2xl border border-border/50 text-sm italic text-foreground/80">
+                    "{comment}"
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 text-muted-foreground text-sm bg-muted/20 rounded-2xl border border-dashed border-border">
+                  No feedback yet. Be the first to tell us what you think!
+                </div>
+              )}
+            </div>
+
+            {/* Comment Form */}
+            <form onSubmit={handleAddComment} className="relative">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Share your thoughts about this dish..."
+                className="w-full min-h-[120px] p-4 bg-muted/40 rounded-2xl border border-border focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm transition-all resize-none"
+                disabled={isSubmitting}
+                required
+              />
+              <button
+                type="submit"
+                disabled={!newComment.trim() || isSubmitting}
+                className="absolute bottom-3 right-3 p-3 bg-blue-500 text-white rounded-xl shadow-lg hover:bg-blue-600 disabled:opacity-50 transition-all active:scale-95"
+              >
+                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Similar Items */}
@@ -150,24 +197,6 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
       </div>
 
       <BottomNav />
-
-      <FeedbackModal
-        isOpen={isFeedbackOpen}
-        onClose={() => setIsFeedbackOpen(false)}
-        itemId={item.id}
-        itemName={item.name}
-        onCommentAdded={async () => {
-          // Reload item to get updated comments
-          const updatedItem = await fetchItemById(id)
-          if (updatedItem) {
-            const transformedItem = {
-              ...transformItem(updatedItem),
-              isPopular: updatedItem.special,
-            }
-            setItem(transformedItem)
-          }
-        }}
-      />
     </MobileContainer>
   )
 }
