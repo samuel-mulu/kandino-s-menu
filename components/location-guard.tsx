@@ -86,10 +86,6 @@ export function LocationGuard({ children }: LocationGuardProps) {
     checkLocation()
   }, [checkLocation])
 
-  if (status === "allowed") {
-    return <>{children}</>
-  }
-
   const getStatusIcon = () => {
     switch (status) {
       case "checking":
@@ -130,42 +126,55 @@ export function LocationGuard({ children }: LocationGuardProps) {
   }
 
   return (
-    <SplashScreen videoSrc="/splash/splash (1).mp4">
-      <div className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-700">
-        {getStatusIcon() && (
-          <div className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center mb-8 border border-white/20 shadow-xl">
-            {getStatusIcon()}
-          </div>
-        )}
-
-        {getStatusTitle() && (
-          <h1 className="text-3xl font-bold mb-4 tracking-tight">
-            {getStatusTitle()}
-          </h1>
-        )}
-
-        {getStatusMessage() && (
-          <p className="text-white/80 text-lg leading-relaxed max-w-sm mb-10">
-            {getStatusMessage()}
-          </p>
-        )}
-
-        {status === "restricted" && distance && (
-          <div className="mb-8 px-5 py-3 bg-white/10 backdrop-blur-sm rounded-2xl text-sm border border-white/10">
-            Current distance: <span className="font-bold text-blue-300">{Math.round(distance)}m</span>
-          </div>
-        )}
-
-        {(status === "denied" || (status !== "checking" && status !== "restricted" && status !== "allowed")) && (
-          <button
-            onClick={checkLocation}
-            className="group flex items-center gap-3 px-10 py-5 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 active:scale-95 transition-all shadow-2xl shadow-white/10"
-          >
-            <RefreshCw className={cn("w-5 h-5 transition-transform group-hover:rotate-180", status === "checking" && "animate-spin")} />
-            {status === "denied" ? "Enable Location" : "Try Again"}
-          </button>
-        )}
+    <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Hotel Menu (The Children) rendered in the background */}
+      <div className={cn(
+        "w-full h-full transition-all duration-1000 ease-in-out",
+        status !== "allowed" && "blur-xl scale-110 brightness-50 grayscale-[0.3] pointer-events-none"
+      )}>
+        {children}
       </div>
-    </SplashScreen>
+
+      {/* Location Checking/Blocking Overlay */}
+      {status !== "allowed" && (
+        <SplashScreen videoSrc="/splash/splash (1).mp4" className="bg-black/20">
+          <div className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-700">
+            {getStatusIcon() && (
+              <div className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center mb-8 border border-white/20 shadow-xl">
+                {getStatusIcon()}
+              </div>
+            )}
+
+            {getStatusTitle() && (
+              <h1 className="text-3xl font-bold mb-4 tracking-tight">
+                {getStatusTitle()}
+              </h1>
+            )}
+
+            {getStatusMessage() && (
+              <p className="text-white/80 text-lg leading-relaxed max-w-sm mb-10 px-4">
+                {getStatusMessage()}
+              </p>
+            )}
+
+            {status === "restricted" && distance && (
+              <div className="mb-8 px-5 py-3 bg-white/10 backdrop-blur-sm rounded-2xl text-sm border border-white/10">
+                Current distance: <span className="font-bold text-blue-300">{Math.round(distance)}m</span>
+              </div>
+            )}
+
+            {(status === "denied" || (status !== "checking" && status !== "restricted" && status !== "allowed")) && (
+              <button
+                onClick={checkLocation}
+                className="group flex items-center gap-3 px-10 py-5 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 active:scale-95 transition-all shadow-2xl shadow-white/10"
+              >
+                <RefreshCw className={cn("w-5 h-5 transition-transform group-hover:rotate-180", status === "checking" && "animate-spin")} />
+                {status === "denied" ? "Enable Location" : "Try Again"}
+              </button>
+            )}
+          </div>
+        </SplashScreen>
+      )}
+    </div>
   )
 }

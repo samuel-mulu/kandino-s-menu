@@ -7,12 +7,14 @@ interface SplashScreenProps {
   children?: React.ReactNode
   className?: string
   videoSrc?: string
+  showVideo?: boolean
 }
 
 export function SplashScreen({
   children,
   className,
-  videoSrc = "/splash/splash (1).mp4"
+  videoSrc = "/splash/splash (1).mp4",
+  showVideo = true
 }: SplashScreenProps) {
   return (
     <div className={cn(
@@ -20,15 +22,17 @@ export function SplashScreen({
       className
     )}>
       {/* Background Video */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-      >
-        <source src={videoSrc} type="video/mp4" />
-      </video>
+      {showVideo && videoSrc && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-40 transition-opacity duration-1000"
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      )}
 
       {/* Dark Overlay for readability */}
       <div className="absolute inset-0 bg-black/40" />
