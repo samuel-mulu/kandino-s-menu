@@ -151,25 +151,11 @@ export default function MenuDetailPage({ params }: MenuDetailPageProps) {
 
           {/* Feedback/Comments Section */}
           <div className="mt-10 pt-6 border-t border-border">
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-4">
               <MessageSquare className="w-5 h-5 text-blue-500" />
               <h2 className="text-lg font-bold">Feedback</h2>
             </div>
-
-            {/* Existing Comments */}
-            <div className="space-y-4 mb-8">
-              {item.comments && item.comments.length > 0 ? (
-                item.comments.map((comment, index) => (
-                  <div key={index} className="p-4 bg-muted/30 rounded-2xl border border-border/50 text-sm italic text-foreground/80">
-                    "{comment}"
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-6 text-muted-foreground text-sm bg-muted/20 rounded-2xl border border-dashed border-border">
-                  No feedback yet. Be the first to tell us what you think!
-                </div>
-              )}
-            </div>
+            <p className="text-xs text-muted-foreground mb-4">Share your thoughts about this dish with us!</p>
 
             {/* Comment Form */}
             <form onSubmit={handleAddComment} className="relative">
