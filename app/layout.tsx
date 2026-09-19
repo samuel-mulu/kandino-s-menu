@@ -12,8 +12,8 @@ import { CallWaiter } from "@/components/call-waiter"
 import { LocationGuard } from "@/components/location-guard"
 
 export const metadata: Metadata = {
-  title: "kandino's kitchen - Menu",
-  description: "Browse our delicious menu offerings",
+  title: "Tekeze Lounge - Menu",
+  description: "Browse the Tekeze Lounge menu",
 }
 
 export const viewport: Viewport = {

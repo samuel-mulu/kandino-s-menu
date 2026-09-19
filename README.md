@@ -223,11 +223,11 @@ The project uses TypeScript with strict mode enabled. Path aliases are configure
 
 ### Environment Variables
 
-Currently, no environment variables are required. If you need to add API endpoints or other configuration, create a `.env.local` file:
+Create a `.env.local` file (or set in Vercel project settings):
 
 ```env
-# Example
-NEXT_PUBLIC_API_URL=https://api.example.com
+# Base URL only — do not repeat /api/v1 (the client normalizes this)
+NEXT_PUBLIC_API_URL=https://apitekeze.friendscheweta.com/api/v1
 ```
 
 ## 🎨 Customization

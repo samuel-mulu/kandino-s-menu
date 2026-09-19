@@ -3,6 +3,16 @@
 //   NEXT_PUBLIC_API_URL=https://your-backend-domain.com/api/v1
 // (set this in `hotel-menu-app/.env.local`)
 
+function normalizeApiBaseUrl(url: string): string {
+  let normalized = url.trim().replace(/\/+$/, "");
+  // Collapse accidental duplicate suffixes like /api/v1/api/v1
+  normalized = normalized.replace(/(\/api\/v1)+$/i, "/api/v1");
+  if (!/\/api\/v1$/i.test(normalized)) {
+    normalized = `${normalized}/api/v1`;
+  }
+  return normalized;
+}
+
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 if (!apiBaseUrl) {
@@ -11,7 +21,7 @@ if (!apiBaseUrl) {
   );
 }
 
-const API_BASE_URL = apiBaseUrl;
+const API_BASE_URL = normalizeApiBaseUrl(apiBaseUrl);
 
 interface ApiResponse<T> {
   success: boolean;

@@ -117,7 +117,7 @@ export function LocationGuard({ children }: LocationGuardProps) {
       case "checking":
         return ""
       case "restricted":
-        return "This digital menu is exclusively available for our guests currently dining at Kandino's Kitchen. Please join us in person to place your order!"
+        return "This digital menu is exclusively available for our guests currently dining at Tekeze Lounge. Please join us in person to place your order!"
       case "denied":
         return "To provide you with the correct menu and table service, we need to verify you are currently at the restaurant."
       default:

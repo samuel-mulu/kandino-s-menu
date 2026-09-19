@@ -150,7 +150,7 @@ export default function MenuPage() {
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto pb-4 scroll-smooth"
       >
-        <Header title="kandino's kitchen" />
+        <Header title="Tekeze Lounge" />
 
         {/* Sticky Search and Categories */}
         <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pt-2 shadow-sm">
